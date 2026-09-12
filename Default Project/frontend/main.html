@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="VisionGrade Admin Dashboard - Live Telemetry & Grading Monitor">
+  <title>VisionGrade | Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+  <div class="app-layout">
+    <header class="topbar" role="banner">
+      <div class="topbar-brand">
+        <a href="main.html" class="logo-link" aria-label="VisionGrade Dashboard">
+          <svg width="36" height="36" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="48" height="48" rx="12" fill="url(#topbarGradient)"/>
+            <path d="M14 24L21 31L34 17" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="topbarGradient" x1="0" y1="0" x2="48" y2="48" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#00d4aa"/>
+                <stop offset="100%" stop-color="#5a2e89"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <span>VisionGrade</span>
+        </a>
+        <span class="badge badge-info" style="font-size:0.625rem;margin-left:0.5rem">LIVE</span>
+      </div>
+      <nav class="topbar-nav" aria-label="Main navigation">
+        <a href="#overview" class="nav-link active" data-section="overview">Overview</a>
+        <a href="#grading" class="nav-link" data-section="grading">Live Grading</a>
+        <a href="#bookings" class="nav-link" data-section="bookings">Bookings</a>
+        <a href="#analytics" class="nav-link" data-section="analytics">Analytics</a>
+        <a href="#hardware" class="nav-link" data-section="hardware">Hardware</a>
+      </nav>
+      <div class="topbar-actions">
+        <div class="connection-status" id="connectionStatus">
+          <span class="status-dot"></span>
+          <span>Connecting...</span>
+        </div>
+        <div class="user-menu">
+          <button class="user-avatar" aria-expanded="false" aria-haspopup="true" aria-label="User menu">
+            <span id="userInitials">A</span>
+          </button>
+          <div class="user-dropdown" role="menu" hidden>
+            <div class="dropdown-header">
+              <span id="userName">Admin</span>
+              <span id="userEmail" class="text-muted"></span>
+            </div>
+            <hr class="dropdown-divider">
+            <button class="dropdown-item" role="menuitem" id="btnLogout">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                <polyline points="16 17 21 12 16 7"/>
+                <line x1="21" y1="12" x2="9" y2="12"/>
+              </svg>
+              Logout
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <aside class="sidebar" id="sidebar" role="complementary" aria-label="Dashboard sidebar">
+      <nav class="sidebar-nav" aria-label="Quick stats">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,var(--accent),#00b896)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statTodayGraded">0</span>
+            <span class="stat-label">Graded Today (qt)</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statActiveFarmers">0</span>
+            <span class="stat-label">Active Farmers</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="2" y="3" width="20" height="14" rx="2"/>
+              <path d="M8 21h8M12 17v4"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statPendingBookings">0</span>
+            <span class="stat-label">Pending Bookings</span>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:linear-gradient(135deg,#ef4444,#dc2626)">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div class="stat-info">
+            <span class="stat-value" id="statAlerts">0</span>
+            <span class="stat-label">System Alerts</span>
+          </div>
+        </div>
+      </nav>
+
+      <div class="sidebar-section">
+        <h3 class="sidebar-title">Edge Device Status</h3>
+        <div class="device-list" id="deviceList">
+          <div class="skeleton" style="height: 70px;"></div>
+          <div class="skeleton" style="height: 70px;"></div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="app-main" role="main">
+      <section id="overview" class="page-section active" aria-labelledby="overview-title">
+        <header class="section-header">
+          <h1 id="overview-title">Dashboard Overview</h1>
+          <p class="section-subtitle">Real-time grading operations monitor</p>
+        </header>
+
+        <div class="grid grid-3">
+          <div class="card chart-card">
+            <h3>Grading Throughput (Last 24h)</h3>
+            <div class="chart-container" style="height:280px">
+              <canvas id="throughputChart"></canvas>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <h3>Grade Distribution</h3>
+            <div class="chart-container" style="height:280px">
+              <canvas id="gradeChart"></canvas>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <h3>Mandi Utilization</h3>
+            <div class="chart-container" style="height:280px">
+              <canvas id="mandiChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2" style="margin-top:1.5rem">
+          <div class="card">
+            <h3>Recent Grading Activity</h3>
+            <div class="activity-feed" id="activityFeed">
+              <div class="skeleton" style="height: 50px;"></div>
+              <div class="skeleton" style="height: 50px;"></div>
+              <div class="skeleton" style="height: 50px;"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h3>System Health</h3>
+            <div class="health-grid" id="healthGrid">
+              <div class="skeleton" style="height: 100px;"></div>
+              <div class="skeleton" style="height: 100px;"></div>
+              <div class="skeleton" style="height: 100px;"></div>
+              <div class="skeleton" style="height: 100px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="grading" class="page-section" aria-labelledby="grading-title">
+        <header class="section-header">
+          <h1 id="grading-title">Live Grading Station</h1>
+          <p class="section-subtitle">Real-time camera feed and grading results</p>
+          <div class="header-actions">
+            <select id="cameraSelect" class="form-select" style="width:auto;min-width:200px">
+              <option value="">Select Camera</option>
+            </select>
+            <button class="btn btn-primary" id="btnStartGrading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polygon points="5 3 19 12 5 21 5 3"/>
+              </svg>
+              Start Session
+            </button>
+          </div>
+        </header>
+
+        <div class="grid grid-2" style="grid-template-columns: 1fr 400px;">
+          <div class="card camera-card">
+            <div class="camera-feed" id="cameraFeed">
+              <div class="camera-placeholder">
+                <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="12" r="4"/>
+                </svg>
+                <p>Select a camera to start live feed</p>
+                <span class="text-muted">WebRTC stream will appear here</span>
+              </div>
+              <video id="cameraVideo" autoplay playsinline muted style="display:none;width:100%;border-radius:var(--radius-sm)"></video>
+              <canvas id="overlayCanvas" style="display:none;position:absolute;top:0;left:0;width:100%;height:100%;border-radius:var(--radius-sm)"></canvas>
+            </div>
+            <div class="camera-controls">
+              <div class="fps-counter">
+                <span>FPS:</span>
+                <span id="fpsValue" class="mono">--</span>
+              </div>
+              <div class="inference-time">
+                <span>Inference:</span>
+                <span id="inferenceValue" class="mono">-- ms</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card results-panel">
+            <h3>Live Grading Results</h3>
+            <div class="current-grading" id="currentGrading">
+              <div class="grading-placeholder">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="var(--text-muted)" stroke-width="1.5">
+                  <circle cx="12" cy="12" r="10"/>
+                  <path d="M12 6v6l4 2"/>
+                </svg>
+                <p>Waiting for grading session...</p>
+              </div>
+            </div>
+            <div class="grading-stats" id="gradingStats">
+              <div class="stat-row">
+                <span>Session Total</span>
+                <span class="mono" id="sessionTotal">0 qt</span>
+              </div>
+              <div class="stat-row">
+                <span>Grade A</span>
+                <span class="mono" id="gradeA">0%</span>
+              </div>
+              <div class="stat-row">
+                <span>Grade B</span>
+                <span class="mono" id="gradeB">0%</span>
+              </div>
+              <div class="stat-row">
+                <span>Rejected</span>
+                <span class="mono" id="gradeRejected">0%</span>
+              </div>
+            </div>
+            <div class="recent-gradings">
+              <h4>Recent Detections</h4>
+              <div class="detection-list" id="detectionList">
+                <p class="text-muted">No detections yet</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="bookings" class="page-section" aria-labelledby="bookings-title">
+        <header class="section-header">
+          <h1 id="bookings-title">Booking Management</h1>
+          <p class="section-subtitle">Manage farmer drop-off appointments</p>
+        </header>
+
+        <div class="card">
+          <div class="table-toolbar">
+            <input type="search" id="bookingSearch" placeholder="Search bookings..." class="search-input">
+            <select id="bookingStatusFilter" class="form-select" style="width:auto">
+              <option value="">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+            <select id="bookingDateFilter" class="form-select" style="width:auto">
+              <option value="">All Dates</option>
+              <option value="today">Today</option>
+              <option value="tomorrow">Tomorrow</option>
+              <option value="week">This Week</option>
+            </select>
+          </div>
+          <div class="table-container">
+            <table id="adminBookingsTable">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Farmer</th>
+                  <th>Date & Time</th>
+                  <th>Mandi</th>
+                  <th>Crop / Qty</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="7" class="text-center">
+                    <div class="loader" style="margin: 2rem auto;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="analytics" class="page-section" aria-labelledby="analytics-title">
+        <header class="section-header">
+          <h1 id="analytics-title">Analytics & Reports</h1>
+          <p class="section-subtitle">Grading performance and business insights</p>
+        </header>
+
+        <div class="grid grid-4" style="margin-bottom:1.5rem">
+          <div class="card kpi-card">
+            <div class="kpi-icon" style="background:linear-gradient(135deg,var(--accent),#00b896)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <span class="kpi-value" id="kpiTotalVolume">0</span>
+              <span class="kpi-label">Total Volume (qt)</span>
+              <span class="kpi-trend positive" id="kpiVolumeTrend">+0%</span>
+            </div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="20" x2="12" y2="10"/>
+                <line x1="18" y1="20" x2="18" y2="4"/>
+                <line x1="6" y1="20" x2="6" y2="16"/>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <span class="kpi-value" id="kpiAvgGrade">A</span>
+              <span class="kpi-label">Avg Grade</span>
+              <span class="kpi-trend positive" id="kpiGradeTrend">+0%</span>
+            </div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon" style="background:linear-gradient(135deg,#f59e0b,#d97706)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                <path d="M2 17l10 5 10-5"/>
+                <path d="M2 12l10 5 10-5"/>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <span class="kpi-value" id="kpiRevenue">₹0</span>
+              <span class="kpi-label">Revenue</span>
+              <span class="kpi-trend positive" id="kpiRevenueTrend">+0%</span>
+            </div>
+          </div>
+          <div class="card kpi-card">
+            <div class="kpi-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="2" y="3" width="20" height="14" rx="2"/>
+                <path d="M8 21h8M12 17v4"/>
+              </svg>
+            </div>
+            <div class="kpi-content">
+              <span class="kpi-value" id="kpiEfficiency">0%</span>
+              <span class="kpi-label">Efficiency</span>
+              <span class="kpi-trend positive" id="kpiEffTrend">+0%</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-2">
+          <div class="card chart-card">
+            <h3>Weekly Volume Trend</h3>
+            <div class="chart-container" style="height:300px">
+              <canvas id="weeklyVolumeChart"></canvas>
+            </div>
+          </div>
+          <div class="card chart-card">
+            <h3>Grade Quality Trend</h3>
+            <div class="chart-container" style="height:300px">
+              <canvas id="qualityTrendChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:1.5rem">
+          <h3>Farmer Performance Leaderboard</h3>
+          <div class="table-container">
+            <table id="leaderboardTable">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Farmer</th>
+                  <th>Total Volume</th>
+                  <th>Avg Grade</th>
+                  <th>Sessions</th>
+                  <th>Revenue</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td colspan="6" class="text-center">
+                    <div class="loader" style="margin: 2rem auto;"></div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section id="hardware" class="page-section" aria-labelledby="hardware-title">
+        <header class="section-header">
+          <h1 id="hardware-title">Hardware Management</h1>
+          <p class="section-subtitle">Monitor and manage edge devices</p>
+        </header>
+
+        <div class="grid grid-3" id="deviceGrid">
+          <div class="skeleton" style="height: 300px;"></div>
+          <div class="skeleton" style="height: 300px;"></div>
+          <div class="skeleton" style="height: 300px;"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast-container" id="toastContainer"></div>
+
+  <div class="modal-overlay" id="deviceModal" role="dialog" aria-modal="true" aria-labelledby="deviceModalTitle">
+    <div class="modal" style="max-width:600px">
+      <header class="modal-header">
+        <h2 class="modal-title" id="deviceModalTitle">Device Details</h2>
+        <button class="modal-close" aria-label="Close modal">&times;</button>
+      </header>
+      <div id="deviceModalContent">
+        <div class="loader" style="margin: 2rem auto;"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/admin.js"></script>
+</body>
+</html>

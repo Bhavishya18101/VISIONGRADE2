@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:7
+    container_name: visiongrade-mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: visiongrade
+    networks:
+      - visiongrade-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: visiongrade-backend
+    ports:
+      - "3000:3000"
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/visiongrade
+      - JWT_SECRET=${JWT_SECRET}
+      - PYTHON_AI_URL=http://python-ai:5000
+    depends_on:
+      - mongodb
+      - python-ai
+    networks:
+      - visiongrade-network
+    volumes:
+      - ./backend:/app/backend
+      - /app/backend/node_modules
+
+  python-ai:
+    build:
+      context: .
+      dockerfile: Dockerfile.python
+    container_name: visiongrade-python-ai
+    ports:
+      - "5000:5000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./python_ai:/app/python_ai
+      - ./models:/app/models
+    networks:
+      - visiongrade-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  frontend:
+    image: nginx:alpine
+    container_name: visiongrade-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    networks:
+      - visiongrade-network
+
+volumes:
+  mongodb_data:
+
+networks:
+  visiongrade-network:
+    driver: bridge
